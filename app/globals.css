@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Single coherent theme. Dark graphite base, one champagne/gold accent.
+ * All tokens live here; components reference them, never raw hex.
+ * ------------------------------------------------------------------ */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces: deep near-black to graphite */
+  --bg: #0a0a0c;
+  --bg-elev: #121216;
+  --surface: rgba(28, 28, 34, 0.55);
+  --surface-solid: #17171c;
+  --surface-strong: rgba(38, 38, 46, 0.72);
+
+  /* Borders / hairlines */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+
+  /* Text: muted neutrals */
+  --text: #ececef;
+  --text-muted: #a1a1aa;
+  --text-dim: #6b6b74;
+
+  /* Single accent: warm champagne / gold */
+  --accent: #d8b578;
+  --accent-strong: #e6c78d;
+  --accent-tint: rgba(216, 181, 120, 0.10);
+  --accent-tint-strong: rgba(216, 181, 120, 0.16);
+  --accent-line: rgba(216, 181, 120, 0.55);
+  --accent-glow: rgba(216, 181, 120, 0.14);
+
+  /* One radius scale */
+  --r-lg: 20px;  /* main panels */
+  --r-md: 12px;  /* cells, buttons */
+  --r-sm: 8px;   /* chips, badges */
+
+  /* Refined shadows tinted to the background hue */
+  --shadow-panel: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+  --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+
+  /* Blur amount for glass */
+  --blur: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.font-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Very soft background lighting: one restrained radial glow, no gradients. */
+.app-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      70% 55% at 50% -8%,
+      var(--accent-glow) 0%,
+      rgba(216, 181, 120, 0.04) 32%,
+      transparent 68%
+    );
+}
+
+/* ------------------------------------------------------------------ *
+ * Liquid-glass surface (approximation). backdrop-filter + layered border
+ * + top highlight. Used ONLY on hierarchy-bearing surfaces, not everything.
+ * ------------------------------------------------------------------ */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(var(--blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-panel), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Fallback 1: browsers without backdrop-filter support -> opaque surface. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--surface-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Fallback 2: users who prefer reduced transparency -> opaque surface. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--surface-solid);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  :root {
+    --surface: var(--surface-solid);
+    --surface-strong: #22222a;
+  }
+}
+
+/* Focus ring: always visible, accent colored, never removed. */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: var(--r-md);
+}
+
+/* Respect reduced motion: neutralize transitions/animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Thin custom scrollbar for the mobile timetable scroller. */
+.tt-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.tt-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.tt-scroll::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+}
