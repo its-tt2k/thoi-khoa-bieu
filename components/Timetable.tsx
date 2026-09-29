@@ -34,11 +34,19 @@ export function Timetable({
       <div className="tt-scroll overflow-x-auto">
         <table
           className="w-full border-collapse text-left"
-          style={{ minWidth: 640 }}
+          style={{ minWidth: 640, tableLayout: "fixed" }}
         >
           <caption className="sr-only">
             Thời khóa biểu 5 tiết mỗi ngày, từ Thứ 2 đến Thứ 6
           </caption>
+          <colgroup>
+            <col style={{ width: 72 }} />
+            <col style={{ width: "20%" }} />
+            <col style={{ width: "20%" }} />
+            <col style={{ width: "20%" }} />
+            <col style={{ width: "20%" }} />
+            <col style={{ width: "20%" }} />
+          </colgroup>
           <thead>
             <tr>
               <th

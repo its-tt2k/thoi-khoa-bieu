@@ -8,6 +8,8 @@ interface WeekSelectorProps {
   selected: WeekdayKey;
   /** The real current weekday, or null on weekend / before hydration. */
   todayKey: WeekdayKey | null;
+  /** Day-of-month string per weekday, e.g. { monday: "28", ... }. */
+  weekDates: Record<WeekdayKey, string> | null;
   onSelect: (key: WeekdayKey) => void;
   /** Whether restrained motion is enabled. */
   animate: boolean;
@@ -21,6 +23,7 @@ interface WeekSelectorProps {
 export function WeekSelector({
   selected,
   todayKey,
+  weekDates,
   onSelect,
   animate,
 }: WeekSelectorProps) {
@@ -58,21 +61,25 @@ export function WeekSelector({
             >
               {day.label}
             </span>
-            {isToday ? (
+            <span className="flex items-center gap-1.5">
               <span
-                className="font-mono text-[9px] uppercase tracking-[0.16em]"
-                style={{ color: isSelected ? "var(--accent)" : "var(--accent-strong)" }}
+                className="text-xs tabular-nums"
+                style={{ color: isSelected ? "var(--accent)" : "var(--text-muted)" }}
               >
-                Hôm nay
+                {weekDates ? `Ngày ${weekDates[day.key]}` : "\u00A0"}
               </span>
-            ) : (
-              <span
-                className="font-mono text-[9px] uppercase tracking-[0.16em]"
-                style={{ color: "var(--text-dim)" }}
-              >
-                5 tiết học
-              </span>
-            )}
+              {isToday && (
+                <span
+                  className="rounded-[var(--r-sm)] px-1 py-0.5 text-[9px] font-medium"
+                  style={{
+                    color: "var(--accent-strong)",
+                    background: "var(--accent-tint)",
+                  }}
+                >
+                  Hôm nay
+                </span>
+              )}
+            </span>
             {isSelected && (
               <motion.span
                 layoutId={animate ? "week-underline" : undefined}

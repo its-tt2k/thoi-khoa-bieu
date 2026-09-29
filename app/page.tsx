@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { ArrowClockwise } from "@phosphor-icons/react";
 import { Header } from "@/components/Header";
 import { WeekSelector } from "@/components/WeekSelector";
 import { Timetable } from "@/components/Timetable";
-import { getCurrentPeriodId, getVietnamNow } from "@/lib/time";
-import { periodTimes, weekdays, type WeekdayKey } from "@/lib/timetable";
+import { getCurrentPeriodId, getVietnamNow, getWeekDates } from "@/lib/time";
+import { periodTimes, type WeekdayKey } from "@/lib/timetable";
 
 export default function Page() {
   const prefersReduced = useReducedMotion();
@@ -19,6 +19,9 @@ export default function Page() {
   const [currentPeriodId, setCurrentPeriodId] = useState<number | null>(null);
   const [isWeekend, setIsWeekend] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [weekDates, setWeekDates] = useState<Record<WeekdayKey, string> | null>(
+    null
+  );
 
   // Selected (previewed) weekday. Defaults to Monday until the client resolves
   // the real day, then snaps to today (or stays on a weekday over the weekend).
@@ -33,6 +36,7 @@ export default function Page() {
       setDateLabel(now.dateLabel);
       setIsWeekend(now.weekdayKey === null);
       setCurrentPeriodId(getCurrentPeriodId(now));
+      setWeekDates(getWeekDates());
     }
     sync();
     setMounted(true);
@@ -64,10 +68,6 @@ export default function Page() {
   const previewing = mounted && todayKey !== null && selected !== todayKey;
 
   const hasPeriodTimes = periodTimes.length > 0;
-  const selectedLabel = useMemo(
-    () => weekdays.find((w) => w.key === selected)?.label ?? "",
-    [selected]
-  );
 
   return (
     <main className="relative min-h-[100dvh] w-full">
@@ -83,27 +83,22 @@ export default function Page() {
           className="flex flex-col gap-3"
           aria-label="Bộ chọn thứ trong tuần"
         >
-          <div className="flex items-center justify-between">
-            <span
-              className="font-mono text-[10px] uppercase tracking-[0.2em]"
-              style={{ color: "var(--text-dim)" }}
-            >
-              Đang xem: {selectedLabel}
-            </span>
-            {previewing && todayKey && (
+          {previewing && todayKey && (
+            <div className="flex justify-end">
               <button
                 onClick={() => setSelected(todayKey)}
-                className="focus-ring inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors"
+                className="focus-ring inline-flex items-center gap-1.5 rounded-[var(--r-sm)] px-2 py-1 text-xs transition-colors"
                 style={{ color: "var(--accent-strong)" }}
               >
-                <ArrowClockwise size={12} weight="bold" />
+                <ArrowClockwise size={13} weight="bold" />
                 Về hôm nay
               </button>
-            )}
-          </div>
+            </div>
+          )}
           <WeekSelector
             selected={selected}
             todayKey={todayKey}
+            weekDates={weekDates}
             onSelect={setSelected}
             animate={animate}
           />
@@ -124,10 +119,7 @@ export default function Page() {
         </section>
 
         <footer className="mt-auto pt-4">
-          <p
-            className="font-mono text-[10px] uppercase tracking-[0.18em]"
-            style={{ color: "var(--text-dim)" }}
-          >
+          <p className="text-xs" style={{ color: "var(--text-dim)" }}>
             Tự động cập nhật theo ngày hiện tại
           </p>
         </footer>

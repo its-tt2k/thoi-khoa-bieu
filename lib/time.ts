@@ -67,6 +67,25 @@ export function getVietnamNow(base: Date = new Date()): VietnamNow {
   };
 }
 
+/**
+ * Day-of-month number (e.g. "29") for each weekday Mon-Fri of the week that
+ * contains `base`, resolved in Vietnam TZ. Shown under each weekday chip so the
+ * label carries real information instead of repeated filler text.
+ */
+export function getWeekDates(base: Date = new Date()): Record<WeekdayKey, string> {
+  const now = getVietnamNow(base);
+  const currentJs = now.jsDay === 0 ? 7 : now.jsDay; // Sunday -> end of week
+  const result = {} as Record<WeekdayKey, string>;
+  for (const w of weekdays) {
+    const d = new Date(base.getTime() + (w.jsDay - currentJs) * 86_400_000);
+    result[w.key] = new Intl.DateTimeFormat("en-GB", {
+      timeZone: TZ,
+      day: "numeric",
+    }).format(d);
+  }
+  return result;
+}
+
 /** Parse "HH:MM" into minutes since midnight. */
 function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(":").map((n) => parseInt(n, 10));
